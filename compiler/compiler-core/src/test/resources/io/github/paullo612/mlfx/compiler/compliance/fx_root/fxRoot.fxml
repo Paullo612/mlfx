@@ -1,0 +1,8 @@
+<?mlfxRootType io.github.paullo612.mlfx.compiler.compliance.fx_root.FxRootRoot?>
+
+<?import io.github.paullo612.mlfx.compiler.test.Car?>
+
+<fx:root xmlns="http://javafx.com/javafx/19.0.0" xmlns:fx="http://javafx.com/fxml/1" type="Car">
+    <model>Ford</model>
+    <windowState>OPENED</windowState>
+</fx:root>
