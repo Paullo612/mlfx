@@ -11,6 +11,12 @@
 
     <artifactId>micronaut</artifactId>
 
+    <name>micronaut</name>
+    <description>
+        Helper annotation processors for Micronaut based reflection backend. Put this to your annotation processors path
+        to compile FXML files if reflections handling is delegated to Micronaut framework.
+    </description>
+
     <dependencies>
         <dependency>
             <groupId>io.github.paullo612.mlfx.compiler</groupId>

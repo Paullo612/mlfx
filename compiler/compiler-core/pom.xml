@@ -11,6 +11,11 @@
 
     <artifactId>compiler-core</artifactId>
 
+    <name>compiler-core</name>
+    <description>
+        FXML compiler implementation. Put this to your annotation processors path to compile FXML files.
+    </description>
+
     <dependencies>
         <dependency>
             <groupId>io.github.paullo612.mlfx.api</groupId>

@@ -11,6 +11,12 @@
 
     <artifactId>api-core</artifactId>
 
+    <name>api-core</name>
+    <description>
+        mlfx core API and partial implementation. This dependency should not be used directly, as it lacks
+        MLFXLoaderDelegate implementation.
+    </description>
+
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>

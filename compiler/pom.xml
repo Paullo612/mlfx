@@ -13,6 +13,9 @@
     <artifactId>compiler</artifactId>
     <packaging>pom</packaging>
 
+    <name>compiler</name>
+    <description>mlfx compiler implementation parent pom.</description>
+
     <modules>
         <module>compiler-core</module>
         <module>micronaut</module>
