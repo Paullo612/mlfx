@@ -13,6 +13,9 @@
     <artifactId>api</artifactId>
     <packaging>pom</packaging>
 
+    <name>api</name>
+    <description>mlfx API parent pom.</description>
+
     <modules>
         <module>internal-stub</module>
         <module>api-core</module>

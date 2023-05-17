@@ -11,6 +11,12 @@
 
     <artifactId>micronaut</artifactId>
 
+    <name>micronaut</name>
+    <description>
+        Micronaut based reflection backend for mlfx. Use this dependency to delegate reflections handling to Micronaut
+        framework.
+    </description>
+
     <dependencies>
         <dependency>
             <groupId>io.github.paullo612.mlfx.api</groupId>

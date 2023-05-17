@@ -11,6 +11,9 @@
 
     <artifactId>internal-stub</artifactId>
 
+    <name>internal-stub</name>
+    <description>mlfx reflection backend stub. This is there to make core-api compile.</description>
+
     <build>
         <plugins>
             <plugin>
