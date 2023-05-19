@@ -32,7 +32,6 @@ abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?
 
     private int slot;
     private boolean hasId;
-    private String value;
 
     IdentifiableFXMLElement(FXMLElement<?> parent) {
         super(parent);
@@ -168,34 +167,16 @@ abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?
 
     @Override
     public void handleEndElement(CompilerContext context) {
-        try {
-            super.handleEndElement(context);
+        super.handleEndElement(context);
 
-            // We have characters inside. Set default string property.
-            if (value != null) {
-                ClassElement classElement = getClassElement();
+        // Handle parent's default property.
+        FXMLElement<?> parent = getParent();
+        if (parent != null) {
+            parent.apply(context, this);
+        }
 
-                PropertyElement propertyElement = findDefaultProperty(context, classElement)
-                        .orElseThrow(() -> context.compileError(
-                                        "No default property specified in class \""
-                                                + ElementUtils.getSimpleName(classElement) + "\"."
-                                )
-                        );
-
-                applyInstanceProperty(context, classElement, propertyElement, loadString(context, value));
-
-                return;
-            }
-
-            // Handle parent's default property.
-            FXMLElement<?> parent = getParent();
-            if (parent != null) {
-                parent.apply(context, this);
-            }
-        } finally {
-            if (!hasId) {
-                context.releaseSlot(slot);
-            }
+        if (!hasId) {
+            context.releaseSlot(slot);
         }
     }
 
@@ -205,6 +186,18 @@ abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?
 
     @Override
     public void handleCharacters(CompilerContext context, String text) {
-        value = MULTI_WHITESPACE_PATTERN.matcher(text).replaceAll(" ").trim();
+        // We have characters inside. Set default string property.
+        String value = MULTI_WHITESPACE_PATTERN.matcher(text).replaceAll(" ").trim();
+
+        ClassElement classElement = getClassElement();
+
+        PropertyElement propertyElement = findDefaultProperty(context, classElement)
+                .orElseThrow(() -> context.compileError(
+                                "No default property specified in class \""
+                                        + ElementUtils.getSimpleName(classElement) + "\"."
+                        )
+                );
+
+        applyInstanceProperty(context, classElement, propertyElement, loadString(context, value));
     }
 }
