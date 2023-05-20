@@ -28,6 +28,12 @@ supports method calls, which is not supported by `javafx-fxml`).
 
 * Scripts support.
 * Incremental compilation is completely broken.
+* Compiling arbitrary fxml files from compile classpath. For example, if you `fx:include`'ing something from dependency 
+jar, you must compile this dependency using mlfx too.
+* No-arg controller methods as event handlers. You have to add event argument to controller method used as event handler
+even if argument is not used. mlfx uses `invokedynamic` JVM instruction to implement `javafx.event.EventHandler` at
+compile time, so, event handler becomes a controller method reference in Java terms. Allowing no-arg methods as event
+handlers would require generating static trampoline function for each handler to make it work.
 
 ## How to use
 
