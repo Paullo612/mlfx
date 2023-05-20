@@ -133,9 +133,7 @@ class CompilerContextImpl implements CompilerContext {
 
             @Override
             public RenderCommand load() {
-                return methodVisitor -> RootRenderer.loadLocation(
-                        RenderUtils.type(targetType).getInternalName(), methodVisitor
-                );
+                return rootRenderer::loadLocation;
             }
         });
 

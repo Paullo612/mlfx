@@ -31,7 +31,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -63,11 +62,10 @@ class RootRenderer implements CompilerContext.Renderer {
 
     static final int LAST_LOCAL_INDEX = CONTROLLER_LOCAL_INDEX;
 
-    static void loadLocation(String internalClassName, GeneratorAdapter methodVisitor) {
-        String classFileName = "/" + internalClassName + ".class";
-        String exceptionMessage = "Cannot find resource \"" + classFileName + "\" on classpath.";
+    private static void loadLocation(String fxmlFileName, GeneratorAdapter methodVisitor) {
+        String exceptionMessage = "Cannot find resource \"./" + fxmlFileName + "\" on classpath.";
 
-        // URL resource = getClass().getResource(classFileName);
+        // URL resource = getClass().getResource(fxmlFileName);
         // if (resource == null) {
         //    throw new CompiledLoadException(exceptionMessage);
         // }
@@ -80,7 +78,7 @@ class RootRenderer implements CompilerContext.Renderer {
                 Type.getType(Object.class),
                 new Method("getClass", "()" + classType.getDescriptor())
         );
-        methodVisitor.push(classFileName);
+        methodVisitor.push(fxmlFileName);
         methodVisitor.invokeVirtual(
                 classType,
                 new Method("getResource", "(" + RenderUtils.STRING_D + ")" + urlType.getDescriptor())
@@ -318,6 +316,10 @@ class RootRenderer implements CompilerContext.Renderer {
         loadNonRequiredResourceBundle(methodVisitor);
     }
 
+    void loadLocation(GeneratorAdapter loadMethodVisitor) {
+        loadLocation(fxmlFileName, loadMethodVisitor);
+    }
+
     private void renderGetABIVersionMethod() {
         MethodVisitor getABIVersionMethod = loaderWriter.visitMethod(
                 Opcodes.ACC_PUBLIC,
@@ -370,8 +372,8 @@ class RootRenderer implements CompilerContext.Renderer {
         //     throw new CompiledLoadException(exceptionMessage);
         // }
         // try {
-        //     return new URL(resource, fxmlFileName).toURI();
-        // } catch (MalformedURLException | URISyntaxException e) {
+        //     return resource.toURI();
+        // } catch (URISyntaxException e) {
         //     throw new CompiledLoadException(e);
         // }
 
@@ -383,11 +385,11 @@ class RootRenderer implements CompilerContext.Renderer {
         getURIMethod.dup();
 
         // Expands to
-        // URL resource = getClass().getResource(classFileName);
+        // URL resource = getClass().getResource(fxmlFileName);
         // if (resource == null) {
         //     throw new CompiledLoadException(exceptionMessage);
         // }
-        loadLocation(internalClassName, getURIMethod);
+        loadLocation(fxmlFileName, getURIMethod);
 
         getURIMethod.push(fxmlFileName);
 
@@ -401,15 +403,15 @@ class RootRenderer implements CompilerContext.Renderer {
 
         Label end = getURIMethod.mark();
 
-        getURIMethod.visitTryCatchBlock(start, end, end, Type.getType(MalformedURLException.class).getInternalName());
-        getURIMethod.visitTryCatchBlock(start, end, end, Type.getType(URISyntaxException.class).getInternalName());
+        Type exceptionType = Type.getType(URISyntaxException.class);
+        getURIMethod.catchException(start, end, exceptionType);
 
         // Local variable slot index does not matter here. We'll throw anyway.
-        getURIMethod.visitVarInsn(Opcodes.ASTORE, 1);
+        getURIMethod.storeLocal(LAST_LOCAL_INDEX + 1, exceptionType);
         Type loadExceptionType = Type.getType(CompiledLoadException.class);
         getURIMethod.newInstance(loadExceptionType);
         getURIMethod.dup();
-        getURIMethod.visitVarInsn(Opcodes.ALOAD, 1);
+        getURIMethod.loadLocal(LAST_LOCAL_INDEX + 1);
         getURIMethod.invokeConstructor(
                 loadExceptionType,
                 new Method(

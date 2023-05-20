@@ -36,22 +36,6 @@ public class MyController implements Initializable {
         this.resources = resources;
     }
 
-    private boolean compareLocation(MyController other) {
-        if (location == other.location) {
-            return true;
-        }
-
-        if ((location != null && other.location == null) || (location == null && other.location != null)) {
-            return false;
-        }
-
-        try {
-            return new URL(location, "./").equals(new URL(other.location, "./"));
-        } catch (MalformedURLException e) {
-            return false;
-        }
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof MyController)) {
@@ -60,7 +44,8 @@ public class MyController implements Initializable {
 
         MyController other = (MyController) obj;
 
-        return compareLocation(other) && Objects.equals(resources, other.resources);
+        return Objects.equals(location, other.location)
+                && Objects.equals(resources, other.resources);
     }
 
     private String dumpFields() {
