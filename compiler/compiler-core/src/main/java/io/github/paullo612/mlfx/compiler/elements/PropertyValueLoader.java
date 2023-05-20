@@ -26,7 +26,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.commons.Method;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,112 +64,39 @@ class PropertyValueLoader implements LoadableFXMLElement.ValueLoader {
                 return null;
             }
 
-            if (value.charAt(0) == '/') {
-                // NB: This path is broken for modularized applications. It does not take in account resource's module
-                //  name. FXMLLoader is broken either. Stay complaint with FXMLLoader.
+            String pathString = value;
+            String exceptionMessage = "Invalid resource: " + value + " not found on the classpath";
 
-                // Absolute classpath URL.
-                String pathString = value.substring(1);
-                String exceptionMessage = "Invalid resource: " + value + " not found on the classpath";
-
-                // URL resource = getClass().getClassLoader().getResource(pathString);
+            return () -> methodVisitor -> {
+                // URL resource = getClass().getResource(pathString);
                 // if (resource == null) {
-                //     throw new CompiledLoadException(exceptionMessage);
+                //    throw new CompiledLoadException(exceptionMessage);
                 // }
                 // resource.toString();
-                return () -> methodVisitor -> {
-                    methodVisitor.loadThis();
+                methodVisitor.loadThis();
 
-                    Type classType = Type.getType(Class.class);
-                    Type classLoaderType = Type.getType(ClassLoader.class);
-                    Type urlType = Type.getType(URL.class);
-
-                    methodVisitor.invokeVirtual(
-                            Type.getType(Object.class),
-                            new Method("getClass", "()" + classType.getDescriptor())
-                    );
-                    methodVisitor.invokeVirtual(
-                            classType,
-                            new Method("getClassLoader", "()" + classLoaderType.getDescriptor())
-                    );
-                    methodVisitor.push(pathString);
-                    methodVisitor.invokeVirtual(
-                            classLoaderType,
-                            new Method("getResource", "(" + RenderUtils.STRING_D + ")" + urlType.getDescriptor())
-                    );
-
-                    Label label = methodVisitor.newLabel();
-                    methodVisitor.dup();
-                    methodVisitor.ifNonNull(label);
-                    methodVisitor.throwException(Type.getType(CompiledLoadException.class), exceptionMessage);
-                    methodVisitor.mark(label);
-                    methodVisitor.invokeVirtual(
-                            urlType,
-                            new Method(RenderUtils.TO_STRING_M, "()" + RenderUtils.STRING_D)
-                    );
-                };
-            }
-
-            String pathString = value;
-
-            CompilerContext.RenderCommand loadLocationCommand =
-                    context.getScope().get(FXMLLoader.LOCATION_KEY).load();
-
-            // URL resource = getClass().getResource(fxmlFileName);
-            // if (resource == null) {
-            //     throw new CompiledLoadException(exceptionMessage);
-            // }
-            // try {
-            //     new URL(resource, pathString).toString();
-            // } catch (MalformedURLException e) {
-            //     throw new CompiledLoadException(e);
-            // }
-            return () -> methodVisitor -> {
-                Label start = methodVisitor.mark();
-
+                Type classType = Type.getType(Class.class);
                 Type urlType = Type.getType(URL.class);
 
-                methodVisitor.newInstance(urlType);
-                methodVisitor.dup();
-
-                // Expands to
-                // URL resource = getClass().getResource(fxmlFileName);
-                // if (resource == null) {
-                //     throw new CompiledLoadException(exceptionMessage);
-                // }
-                loadLocationCommand.render(methodVisitor);
-
+                methodVisitor.invokeVirtual(
+                        Type.getType(Object.class),
+                        new Method("getClass", "()" + classType.getDescriptor())
+                );
                 methodVisitor.push(pathString);
-                methodVisitor.invokeConstructor(
-                        urlType,
-                        new Method(
-                                RenderUtils.CONSTRUCTOR_N, "(" + urlType.getDescriptor() + RenderUtils.STRING_D + ")V"
-                        )
+                methodVisitor.invokeVirtual(
+                        classType,
+                        new Method("getResource", "(" + RenderUtils.STRING_D + ")" + urlType.getDescriptor())
                 );
-                methodVisitor.invokeVirtual(urlType, new Method(RenderUtils.TO_STRING_M, "()" + RenderUtils.STRING_D));
-                Label next = methodVisitor.newLabel();
-                methodVisitor.goTo(next);
 
-                Label end = methodVisitor.mark();
-
-                Type exceptionType = Type.getType(MalformedURLException.class);
-                methodVisitor.catchException(start, end, exceptionType);
-
-                // Local variable slot index does not matter here. We'll throw anyway.
-                methodVisitor.storeLocal(context.getDefaultSlot(), exceptionType);
-                Type loadExceptionType = Type.getType(CompiledLoadException.class);
-                methodVisitor.newInstance(loadExceptionType);
+                Label label = methodVisitor.newLabel();
                 methodVisitor.dup();
-                methodVisitor.loadLocal(context.getDefaultSlot());
-                methodVisitor.invokeConstructor(
-                        loadExceptionType,
-                        new Method(
-                                RenderUtils.CONSTRUCTOR_N, "(" + Type.getType(Throwable.class).getDescriptor() + ")V"
-                        )
+                methodVisitor.ifNonNull(label);
+                methodVisitor.throwException(Type.getType(CompiledLoadException.class), exceptionMessage);
+                methodVisitor.mark(label);
+                methodVisitor.invokeVirtual(
+                        urlType,
+                        new Method(RenderUtils.TO_STRING_M, "()" + RenderUtils.STRING_D)
                 );
-                methodVisitor.throwException();
-
-                methodVisitor.mark(next);
             };
         } else if (value.startsWith(FXMLLoader.RESOURCE_KEY_PREFIX)) {
             value = value.substring(FXMLLoader.RESOURCE_KEY_PREFIX.length());

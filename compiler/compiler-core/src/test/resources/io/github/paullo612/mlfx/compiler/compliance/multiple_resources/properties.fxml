@@ -15,4 +15,7 @@
 -->
 <?import io.github.paullo612.mlfx.compiler.test.Car?>
 
-<Car xmlns="http://javafx.com/javafx/19.0.0" bodyColors="@body_colors, @body_colors1, @body_colors2"/>
+<Car
+        xmlns="http://javafx.com/javafx/19.0.0"
+        bodyColors="@body_colors, @/io/github/paullo612/mlfx/compiler/compliance/multiple_resources/body_colors1, @body_colors2"
+/>
