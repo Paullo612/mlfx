@@ -26,7 +26,6 @@ import io.micronaut.inject.ast.PropertyElement;
 public class ReadOnlyInstanceProperty extends LoadableFXMLElement<LoadableFXMLElement<?>> {
 
     private final PropertyElement propertyElement;
-    private String value;
 
     public ReadOnlyInstanceProperty(LoadableFXMLElement<?> parent, PropertyElement propertyElement) {
         super(parent);
@@ -40,16 +39,7 @@ public class ReadOnlyInstanceProperty extends LoadableFXMLElement<LoadableFXMLEl
 
     @Override
     public void handleCharacters(CompilerContext context, String text) {
-        value = MULTI_WHITESPACE_PATTERN.matcher(text).replaceAll(" ").trim();
-    }
-
-    @Override
-    public void handleEndElement(CompilerContext context) {
-        super.handleEndElement(context);
-
-        if (value == null || value.isEmpty()) {
-            return;
-        }
+        String value = MULTI_WHITESPACE_PATTERN.matcher(text).replaceAll(" ").trim();
 
         getParent().apply(context, this, LoadableFXMLElement.loadString(context, value));
     }
