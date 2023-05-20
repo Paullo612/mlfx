@@ -24,7 +24,6 @@ public class StaticPropertyFXMLElement extends FXMLElement<LoadableFXMLElement<?
 
     private final String name;
     private final ClassElement staticClassElement;
-    private String value;
 
     public StaticPropertyFXMLElement(LoadableFXMLElement<?> parent, String name, ClassElement classElement) {
         super(parent);
@@ -40,11 +39,8 @@ public class StaticPropertyFXMLElement extends FXMLElement<LoadableFXMLElement<?
 
     @Override
     public void handleCharacters(CompilerContext context, String text) {
-        value = MULTI_WHITESPACE_PATTERN.matcher(text).replaceAll(" ").trim();
-    }
+        String value = MULTI_WHITESPACE_PATTERN.matcher(text).replaceAll(" ").trim();
 
-    @Override
-    public void handleEndElement(CompilerContext context) {
         getParent().apply(
                 context,
                 staticClassElement,
