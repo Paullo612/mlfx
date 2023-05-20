@@ -98,6 +98,52 @@ Add dependency to API module and add compiler to annotation processor path. For 
 
 ```
 
+## Processing instructions
+
+There are two new processing instructions that mlfx may need. Those are `mlfxControllerType` and `mlfxRootType`. mlfx
+compiles ahead of time, so, it must know actual controller and root types when compiling. Consider following example:
+```xml
+<Car xmlns="http://javafx.com/javafx/19.0.0">
+    <Engine manufacturer="$controller.foo.bar.baz"/>
+</Car>
+```
+There is controller reference, but what is actual controller type? Has it `foo` property? What is `foo` property type?
+So, to make it compile, if your controller is of `com.acme.CarController` type, you have to add processing instruction
+to your fxml file:
+```xml
+<?mlfxControllerType com.acme.CarController?>
+<Car xmlns="http://javafx.com/javafx/19.0.0">
+    <Engine manufacturer="$controller.foo.bar.baz"/>
+</Car>
+```
+Then you can pass `com.acme.CarController` instance to `MLFXLoader` through `setController` method when loading.
+
+When controller is specified on root element, processing instruction is not needed:
+```xml
+<Car 
+        xmlns="http://javafx.com/javafx/19.0.0" 
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="com.acme.CarController"
+>
+    <Engine manufacturer="$controller.foo.bar.baz"/>
+</Car>
+```
+This will compile fine without any special processing instructions.
+
+Same applies to `fx:root` elements. There is no attribute to express actual root type in `fx:` namespace, so processing
+instruction is mandatory in this case. If actual component class is `com.acme.MusculeCar`, you can express it in FXML
+like this:
+```xml
+<?mlfxRootType com.acme.MusculeCar?>
+<fx:root 
+        xmlns="http://javafx.com/javafx/19.0.0" 
+        xmlns:fx="http://javafx.com/fxml/1"
+        type="Car"
+>
+    <Engine manufacturer="$propertyOfMuscleCar.bar.baz"/>
+</fx:root>
+```
+
 ## Supported annotation processor options
 
 `micronaut.mlfx.resourcesDirectory` specifies base directory where to search for fxml files. Points to project's
