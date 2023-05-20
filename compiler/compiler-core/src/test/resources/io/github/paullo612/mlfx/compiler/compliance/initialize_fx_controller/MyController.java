@@ -36,22 +36,6 @@ public class MyController {
         initialized = true;
     }
 
-    private boolean compareLocation(MyController other) {
-        if (location == other.location) {
-            return true;
-        }
-
-        if ((location != null && other.location == null) || (location == null && other.location != null)) {
-            return false;
-        }
-
-        try {
-            return new URL(location, "./").equals(new URL(other.location, "./"));
-        } catch (MalformedURLException e) {
-            return false;
-        }
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof MyController)) {
@@ -60,7 +44,9 @@ public class MyController {
 
         MyController other = (MyController) obj;
 
-        return compareLocation(other) && Objects.equals(resources, other.resources) && initialized == other.initialized;
+        return Objects.equals(location, other.location)
+                && Objects.equals(resources, other.resources)
+                && initialized == other.initialized;
     }
 
     private String dumpFields() {

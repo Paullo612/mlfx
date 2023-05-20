@@ -116,7 +116,7 @@ class PropertyValueLoader implements LoadableFXMLElement.ValueLoader {
             CompilerContext.RenderCommand loadLocationCommand =
                     context.getScope().get(FXMLLoader.LOCATION_KEY).load();
 
-            // URL resource = getClass().getResource(classFileName);
+            // URL resource = getClass().getResource(fxmlFileName);
             // if (resource == null) {
             //     throw new CompiledLoadException(exceptionMessage);
             // }
@@ -134,7 +134,7 @@ class PropertyValueLoader implements LoadableFXMLElement.ValueLoader {
                 methodVisitor.dup();
 
                 // Expands to
-                // URL resource = getClass().getResource(classFileName);
+                // URL resource = getClass().getResource(fxmlFileName);
                 // if (resource == null) {
                 //     throw new CompiledLoadException(exceptionMessage);
                 // }
