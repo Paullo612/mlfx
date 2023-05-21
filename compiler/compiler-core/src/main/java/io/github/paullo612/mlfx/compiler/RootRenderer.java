@@ -367,38 +367,20 @@ class RootRenderer implements CompilerContext.Renderer {
 
         getURIMethod.visitCode();
 
-        // URL resource = getClass().getResource(classFileName);
-        // if (resource == null) {
-        //     throw new CompiledLoadException(exceptionMessage);
-        // }
-        // try {
-        //     return resource.toURI();
-        // } catch (URISyntaxException e) {
-        //     throw new CompiledLoadException(e);
-        // }
-
-        Type urlType = Type.getType(URL.class);
-
-        Label start = getURIMethod.mark();
-
-        getURIMethod.newInstance(urlType);
-        getURIMethod.dup();
-
-        // Expands to
         // URL resource = getClass().getResource(fxmlFileName);
         // if (resource == null) {
         //     throw new CompiledLoadException(exceptionMessage);
         // }
         loadLocation(fxmlFileName, getURIMethod);
 
-        getURIMethod.push(fxmlFileName);
+        // try {
+        //     return resource.toURI();
+        // } catch (URISyntaxException e) {
+        //     throw new CompiledLoadException(e);
+        // }
+        Label start = getURIMethod.mark();
 
-        getURIMethod.invokeConstructor(
-                urlType,
-                new Method(RenderUtils.CONSTRUCTOR_N, "(" + urlType.getDescriptor() + RenderUtils.STRING_D + ")V")
-        );
-
-        getURIMethod.invokeVirtual(urlType, new Method("toURI", "()" + uriType.getDescriptor()));
+        getURIMethod.invokeVirtual(Type.getType(URL.class), new Method("toURI", "()" + uriType.getDescriptor()));
         getURIMethod.returnValue();
 
         Label end = getURIMethod.mark();
