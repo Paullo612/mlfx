@@ -4,7 +4,7 @@
 
     <groupId>io.github.paullo612.mlfx</groupId>
     <artifactId>mlfx</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -46,7 +46,7 @@
         <connection>scm:git:git://github.com/Paullo612/mlfx.git</connection>
         <developerConnection>scm:git:ssh://github.com:Paullo612/mlfx.git</developerConnection>
         <url>https://github.com/Paullo612/mlfx/tree/master</url>
-      <tag>v0.6.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <modules>
