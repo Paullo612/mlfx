@@ -64,7 +64,7 @@ public interface CompilerContext extends BindingContext {
 
     int getDefaultSlot();
 
-    int acquireSlot();
+    int acquireSlot(ClassElement classElement);
 
     void releaseSlot(int slot);
 }

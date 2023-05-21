@@ -30,16 +30,11 @@ import java.util.Map;
 // FXML element that can be identified. Can have id assigned, so, can be referenced anywhere in FXML file.
 abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?>> {
 
-    private int slot;
+    private int slot = -1;
     private boolean hasId;
 
     IdentifiableFXMLElement(FXMLElement<?> parent) {
         super(parent);
-    }
-
-    @Override
-    public void initialize(CompilerContext context) {
-        slot = context.acquireSlot();
     }
 
     @Override
@@ -175,7 +170,7 @@ abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?
             parent.apply(context, this);
         }
 
-        if (!hasId) {
+        if (slot != -1 && !hasId) {
             context.releaseSlot(slot);
         }
     }
@@ -199,5 +194,9 @@ abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?
                 );
 
         applyInstanceProperty(context, classElement, propertyElement, loadString(context, value));
+    }
+
+    void acquireSlot(CompilerContext context) {
+        slot = context.acquireSlot(getClassElement());
     }
 }

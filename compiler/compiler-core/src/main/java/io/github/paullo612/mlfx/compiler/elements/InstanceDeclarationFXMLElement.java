@@ -717,6 +717,8 @@ public class InstanceDeclarationFXMLElement extends IdentifiableFXMLElement {
 
     @Override
     public void handleAttributesLookaheadFinish(CompilerContext context) {
+        acquireSlot(context);
+
         if (constructCommand != null) {
             context.getRenderer().render(constructCommand);
             constructCommand = null;
