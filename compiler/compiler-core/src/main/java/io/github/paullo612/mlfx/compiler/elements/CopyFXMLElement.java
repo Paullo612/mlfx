@@ -46,6 +46,7 @@ public class CopyFXMLElement extends IdentifiableFXMLElement {
             }
 
             this.continuation = continuation;
+            acquireSlot(context);
 
             return;
         }

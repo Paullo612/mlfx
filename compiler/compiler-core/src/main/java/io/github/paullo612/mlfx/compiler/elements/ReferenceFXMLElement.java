@@ -43,6 +43,7 @@ public class ReferenceFXMLElement extends IdentifiableFXMLElement {
             }
 
             this.continuation = continuation;
+            acquireSlot(context);
 
             return;
         }

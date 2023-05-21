@@ -46,13 +46,6 @@ public class IncludeFXMLElement extends IdentifiableFXMLElement {
     }
 
     @Override
-    public void initialize(CompilerContext context) {
-        super.initialize(context);
-
-        this.charset = context.getCharset();
-    }
-
-    @Override
     public boolean requiresAttributesLookahead() {
         // NB: We use attributes lookahead here, as actual element type can only be determined from attribute.
         return true;
@@ -108,7 +101,8 @@ public class IncludeFXMLElement extends IdentifiableFXMLElement {
         CompileTask compileTask = context.getCompileTask(location)
                 .orElseThrow(() -> context.compileError("Source file " + location + " not found."));
 
-        reference = compileTask.compile(charset);
+        reference = compileTask.compile(charset != null ? charset : context.getCharset());
+        acquireSlot(context);
 
         ExpressionContext.Loadable controllerAccessorFactory = context.getControllerAccessorFactory();
 

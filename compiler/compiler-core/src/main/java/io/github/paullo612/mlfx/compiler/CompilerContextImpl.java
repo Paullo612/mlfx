@@ -444,16 +444,59 @@ class CompilerContextImpl implements CompilerContext {
     }
 
     @Override
-    public int acquireSlot() {
-        int slot = slots.nextClearBit(0);
-        slots.set(slot);
+    public int acquireSlot(ClassElement classElement) {
+        int slotSize = RenderUtils.type(classElement).getSize();
+
+        int slot = 0;
+
+        // NB: Each slot takes two bits in slots set. First bit indicates that slot is acquired, second bit represents
+        //  slot length. For example, if type takes 3 variable slots (impossible for JVM, but just as an example) then
+        //  slots bit sequence will look like this: | ... 11 11 10 ... |. We can get sequence length by summing its
+        //  second bits. 0 indicates the end of a sequence.
+        outer: while (true) {
+            // Find next window start.
+            while (slots.get(slot * 2)) {
+                ++slot;
+            }
+
+            for (int i = 1; i < slotSize; ++i) {
+                if (slots.get((slot + i) * 2)) {
+                    // This slot is already acquired. Window length is less than required. Search for next window.
+                    slot += i;
+                    continue outer;
+                }
+            }
+
+            // Found a window of appropriate length. Let's use it.
+            break;
+        }
+
+        // Acquire slots.
+        for (int i = 0; i < slotSize; ++i) {
+            slots.set((slot + i) * 2);
+            if (i < slotSize - 1) {
+                slots.set((slot + i) * 2 + 1);
+            }
+        }
+
         return slot + getDefaultSlot();
     }
 
     @Override
     public void releaseSlot(int slot) {
         slot = slot - getDefaultSlot();
-        slots.clear(slot);
+
+        // Release first slot.
+        slots.clear(slot * 2);
+
+        // Keep releasing till sequence end.
+        while (slots.get(slot * 2 + 1)) {
+            // Clear sequence bit.
+            slots.clear(slot * 2 + 1);
+            // Release next slot.
+            slots.clear(slot * 2 + 2);
+            ++slot;
+        }
     }
 
     @Override

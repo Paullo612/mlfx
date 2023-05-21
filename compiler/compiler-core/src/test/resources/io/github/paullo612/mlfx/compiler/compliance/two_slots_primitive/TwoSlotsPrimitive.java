@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.paullo612.mlfx.compiler.test;
+package io.github.paullo612.mlfx.compiler.compliance.two_slots_primitive;
 
-public class FooFactory {
+import io.github.paullo612.mlfx.api.CompileFXML;
 
-    public static int foo() {
-        return 42;
-    }
-
-    public static long bar() {
-        return 42L;
-    }
-}
+@CompileFXML(fxmlDirectories = "io/github/paullo612/mlfx/compiler/compliance/two_slots_primitive")
+class TwoSlotsPrimitive { }
