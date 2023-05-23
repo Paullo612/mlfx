@@ -135,6 +135,7 @@ public class IncludeFXMLElement extends IdentifiableFXMLElement {
                 // }
                 Label start = methodVisitor.mark();
 
+                methodVisitor.push(resources);
                 methodVisitor.invokeStatic(
                         resourceBundleType,
                         new Method("getBundle", "(" + RenderUtils.STRING_D + ")" + resourceBundleType.getDescriptor())
