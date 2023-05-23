@@ -177,7 +177,7 @@ class ComplianceSpec extends CompileSpec {
         String className = workingDirectory
                 .relativize(classPath)
                 .toString()
-                .replace('/', '.')
+                .replace(workingDirectory.getFileSystem().getSeparator(), '.')
 
         className = className.substring(0, className.length() - CLASS_EXTENSION.length())
 
@@ -197,7 +197,7 @@ class ComplianceSpec extends CompileSpec {
         String className = workingDirectory
                 .relativize(classPath)
                 .toString()
-                .replace('/', '.')
+                .replace(workingDirectory.getFileSystem().getSeparator(), '.')
 
         className = className.substring(0, className.length() - CLASS_EXTENSION.length())
 
@@ -216,7 +216,7 @@ class ComplianceSpec extends CompileSpec {
         String resourceBundleName = workingDirectory
                 .relativize(resourceBundlePath)
                 .toString()
-                .replace('/', '.')
+                .replace(workingDirectory.getFileSystem().getSeparator(), '.')
 
         resourceBundleName =
                 resourceBundleName.substring(0, resourceBundleName.length() - PROPERTIES_EXTENSION.length())
@@ -234,7 +234,7 @@ class ComplianceSpec extends CompileSpec {
         String loaderClassName = fxmlFileResourcePath.substring(
                 0, fxmlFileResourcePath.length() - CompileFXMLVisitor.FXML_EXTENSION.size()
         )
-        loaderClassName = loaderClassName.replace('/', '.')
+        loaderClassName = loaderClassName.replace(workingDirectory.getFileSystem().getSeparator(), '.')
         loaderClassName = CompileFXMLVisitor.computeClassName(loaderClassName)
 
         Class<?> loaderClass = Class.forName(loaderClassName)
@@ -253,7 +253,12 @@ class ComplianceSpec extends CompileSpec {
             Object root,
             Object controller,
             ResourceBundle resourceBundle) {
-        String fxmlFileResourcePath = workingDirectory.relativize(fxmlFile).toString()
+        String fxmlFileResourcePath = workingDirectory.relativize(fxmlFile).toString();
+        String separator = workingDirectory.getFileSystem().getSeparator()
+        if ('/' != separator) {
+            fxmlFileResourcePath = fxmlFileResourcePath
+                    .replace(separator, '/')
+        }
 
         // NB: Use |ComplianceSpec.class.getResource(...)| to get FXML file URL. Using |fxmlFile.toUri().toURL()| may
         //  produce URL encoded escape sequences in different case (in case there are non-ASCII symbols in path
