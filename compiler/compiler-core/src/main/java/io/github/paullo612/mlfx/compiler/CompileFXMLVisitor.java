@@ -132,8 +132,7 @@ public class CompileFXMLVisitor implements TypeElementVisitor<CompileFXML, Objec
 
         String separator = projectDirectory.getFileSystem().getSeparator();
 
-        String resourcesDirectory = context.getOptions().getOrDefault(RESOURCES_DIRECTORY_OPTION, RESOURCES_DIRECTORY)
-                .replace("/", separator);
+        String resourcesDirectory = context.getOptions().getOrDefault(RESOURCES_DIRECTORY_OPTION, RESOURCES_DIRECTORY);
 
         Path resourcesPath = projectDirectory.resolve(resourcesDirectory);
 
@@ -168,9 +167,7 @@ public class CompileFXMLVisitor implements TypeElementVisitor<CompileFXML, Objec
                 directory = directory.substring(1);
             }
 
-            String directorySubPath = directory.replace("/", separator);
-
-            Path directoryPath = resourcesPath.resolve(directorySubPath);
+            Path directoryPath = resourcesPath.resolve(directory);
 
             if (!Files.isDirectory(directoryPath)) {
                 context.warn(
@@ -211,7 +208,15 @@ public class CompileFXMLVisitor implements TypeElementVisitor<CompileFXML, Objec
                 className = computeClassName(className);
 
                 ClassElement targetClass = ClassElement.of(className);
-                tasks.add(taskFactory.registerTask(URI.create(relativeFilePath.toString()), targetClass));
+
+                String relativePathString = relativeFilePath.toString();
+
+                if (!"/".equals(separator)) {
+                    relativePathString = relativePathString
+                            .replace(separator, "/");
+                }
+
+                tasks.add(taskFactory.registerTask(URI.create(relativePathString), targetClass));
             }
         }
 
