@@ -15,6 +15,7 @@
  */
 package io.github.paullo612.mlfx.compiler.micronaut;
 
+import com.google.auto.service.AutoService;
 import io.github.paullo612.mlfx.api.CompiledFXMLLoader;
 import io.github.paullo612.mlfx.api.GeneratedByMLFX;
 import io.github.paullo612.mlfx.compiler.CompileFXMLVisitor;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+@AutoService(TypeElementVisitor.class)
 public class CompileFXMLMicronautVisitor implements TypeElementVisitor<GeneratedByMLFX, Object> {
 
     private final Set<ClassElement> services = new TreeSet<>(Comparator.comparing(Element::getName));

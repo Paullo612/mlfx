@@ -15,6 +15,7 @@
  */
 package io.github.paullo612.mlfx.compiler.micronaut;
 
+import com.google.auto.service.AutoService;
 import io.github.paullo612.mlfx.compiler.CompileFXMLVisitor;
 import io.micronaut.context.annotation.Executable;
 import io.micronaut.core.annotation.AnnotationValue;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@AutoService(TypeElementVisitor.class)
 public class FXMLMicronautVisitor implements TypeElementVisitor<Object, Object> {
 
     private static final String FXML_ANNOTATION = "javafx.fxml.FXML";
