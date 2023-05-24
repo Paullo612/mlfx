@@ -15,6 +15,7 @@
  */
 package io.github.paullo612.mlfx.compiler;
 
+import com.google.auto.service.AutoService;
 import io.github.paullo612.mlfx.api.CompileFXML;
 import io.github.paullo612.mlfx.api.CompiledFXMLLoader;
 import io.micronaut.core.annotation.AnnotationMetadata;
@@ -41,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@AutoService(TypeElementVisitor.class)
 public class CompileFXMLVisitor implements TypeElementVisitor<CompileFXML, Object> {
 
     private static boolean MICRONAUT_VERSION_CHECK_DONE;
