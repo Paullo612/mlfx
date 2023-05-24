@@ -80,6 +80,14 @@ Add dependency to API module and add compiler to annotation processor path. For 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    ...
+                    <!-- Incremental compilation is completely broken in mlfx, so, recompile whole module on any change 
+                         in fxml files. -->
+                    <fileExtensions>
+                        <fileExtension>class</fileExtension>
+                        <fileExtension>jar</fileExtension>
+                        <fileExtension>fxml</fileExtension>
+                    </fileExtensions>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>io.micronaut</groupId>
@@ -93,6 +101,7 @@ Add dependency to API module and add compiler to annotation processor path. For 
                         </path>
                         ...
                     </annotationProcessorPaths>
+                    ...
                 </configuration>
             </plugin>
             ...
@@ -103,6 +112,7 @@ Add dependency to API module and add compiler to annotation processor path. For 
 </project>
 
 ```
+See [sample Maven project](https://github.com/Paullo612/mlfx-sample), last commit adds mlfx support to it.
 
 ## Processing instructions
 
