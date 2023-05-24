@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.github.paullo612.mlfx.api</groupId>
         <artifactId>api</artifactId>
-        <version>0.6.1-SNAPSHOT</version>
+        <version>0.6.1</version>
     </parent>
 
     <artifactId>internal-stub</artifactId>
@@ -27,7 +27,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <property name="maven.build.directory" value="${project.build.directory}"/>
+                                <property name="maven.build.directory" value="${project.build.directory}" />
                                 <mkdir dir="${maven.build.directory}/apidocs" />
                             </target>
                         </configuration>
