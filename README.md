@@ -67,7 +67,7 @@ Add dependency to API module and add compiler to annotation processor path. For 
         <dependency>
             <groupId>io.github.paullo612.mlfx.api</groupId>
             <artifactId>micronaut</artifactId>
-            <version>0.6.0</version>
+            <version>0.6.1</version>
         </dependency>
         ...
     </dependencies>
@@ -97,7 +97,7 @@ Add dependency to API module and add compiler to annotation processor path. For 
                         <path>
                             <groupId>io.github.paullo612.mlfx.compiler</groupId>
                             <artifactId>micronaut</artifactId>
-                            <version>0.6.0</version>
+                            <version>0.6.1</version>
                         </path>
                         ...
                     </annotationProcessorPaths>
