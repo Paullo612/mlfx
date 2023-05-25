@@ -15,7 +15,6 @@
  */
 package io.github.paullo612.mlfx.compiler.elements;
 
-import com.sun.javafx.beans.IDProperty;
 import io.github.paullo612.mlfx.compiler.CompilerContext;
 import io.github.paullo612.mlfx.compiler.ProcessingInstructions;
 import io.github.paullo612.mlfx.expression.ExpressionContext;
@@ -29,6 +28,8 @@ import java.util.Map;
 
 // FXML element that can be identified. Can have id assigned, so, can be referenced anywhere in FXML file.
 abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?>> {
+
+    private static final String ID_PROPERTY_ANNOTATION = "com.sun.javafx.beans.IDProperty";
 
     private int slot = -1;
     private boolean hasId;
@@ -77,10 +78,10 @@ abstract class IdentifiableFXMLElement extends LoadableFXMLElement<FXMLElement<?
     private void setIdProperty(CompilerContext context, String id) {
         ClassElement classElement = getClassElement();
 
-        AnnotationValue<IDProperty> annotation = classElement.getAnnotation(IDProperty.class);
+        AnnotationValue<?> annotation = classElement.getAnnotation(ID_PROPERTY_ANNOTATION);
 
         if (annotation == null) {
-            // No ID property present, noting to do here.
+            // No ID property present, nothing to do here.
             return;
         }
 
