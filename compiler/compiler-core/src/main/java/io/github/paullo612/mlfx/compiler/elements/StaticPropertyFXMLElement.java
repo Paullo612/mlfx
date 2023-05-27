@@ -48,4 +48,14 @@ public class StaticPropertyFXMLElement extends FXMLElement<LoadableFXMLElement<?
                 LoadableFXMLElement.loadString(context, value)
         );
     }
+
+    @Override
+    void apply(CompilerContext context, IdentifiableFXMLElement element) {
+        getParent().apply(
+                context,
+                staticClassElement,
+                name,
+                IdentifiableFXMLElement.loadElement(context, element)
+        );
+    }
 }

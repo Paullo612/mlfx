@@ -1122,7 +1122,7 @@ public abstract class LoadableFXMLElement<P extends FXMLElement<?>> extends FXML
         if (staticGetters.isEmpty()) {
             // FXMLLoader throws |com.sun.javafx.fxml.PropertyNotFoundException| in such case. We're inside annotation
             //  processor, so, we can throw |CompileErrorException| instead.
-            throw context.compileError("Static property \"" + name + "\" is read-only.");
+            throw context.compileError("Static property \"" + name + "\" is read-only or does not exist.");
         }
 
         ClassElement staticPropertyType = staticGetters.get(0).getReturnType();
