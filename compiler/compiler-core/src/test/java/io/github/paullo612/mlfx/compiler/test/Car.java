@@ -16,8 +16,10 @@
 package io.github.paullo612.mlfx.compiler.test;
 
 import javafx.beans.DefaultProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -52,6 +54,8 @@ public class Car {
     private final ObservableList<Wheel> wheels = FXCollections.observableArrayList();
 
     private final ObjectProperty<EventHandler<ActionEvent>> onDrive = new SimpleObjectProperty<>(this, "onDrive");
+
+    private final DoubleProperty engineRPM = new SimpleDoubleProperty();
 
     public String getModel() {
         return model.getValue();
@@ -101,6 +105,18 @@ public class Car {
         return onDrive;
     }
 
+    public double getEngineRPM() {
+        return engineRPM.get();
+    }
+
+    public void setEngineRPM(double value) {
+        engineRPM.set(value);
+    }
+
+    public DoubleProperty engineRPMProperty() {
+        return engineRPM;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Car)) {
@@ -113,7 +129,8 @@ public class Car {
                 && Objects.equals(engine.get(), other.engine.get())
                 && Objects.equals(anotherEngine, other.anotherEngine)
                 && Objects.equals(bodyColors, other.bodyColors)
-                && Objects.equals(wheels, other.wheels);
+                && Objects.equals(wheels, other.wheels)
+                && engineRPM.get() == other.engineRPM.get();
     }
 
     protected String dumpFields() {
@@ -130,7 +147,8 @@ public class Car {
                 ",\n  engine = " +  engine +
                 ",\n  anotherEngine = " +  anotherEngine +
                 ",\n  bodyColors = " + bodyColors +
-                ",\n  wheels = " + wheels;
+                ",\n  wheels = " + wheels +
+                ",\n  engineRPM = " + engineRPM.get();
     }
 
     @Override
