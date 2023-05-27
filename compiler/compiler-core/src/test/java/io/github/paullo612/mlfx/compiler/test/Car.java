@@ -43,6 +43,15 @@ public class Car {
         return engine.engineLocation;
     }
 
+    public static void setSpareWheel(Trunk trunk, Wheel wheel) {
+        trunk.spareWheel = wheel;
+    }
+
+    // NB: We're inferring static property type from getter, so, getter is mandatory here.
+    public static Wheel getSpareWheel(Trunk trunk) {
+        return trunk.spareWheel;
+    }
+
     private final Property<String> model = new SimpleStringProperty();
 
     private final ObjectProperty<Engine> engine = new SimpleObjectProperty<>();
