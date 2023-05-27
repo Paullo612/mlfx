@@ -16,6 +16,8 @@
 package io.github.paullo612.mlfx.compiler.test;
 
 import javafx.beans.DefaultProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -38,6 +40,8 @@ public class Engine {
     private final StringProperty manufacturer = new SimpleStringProperty();
 
     private final Crankshaft crankshaft = new Crankshaft();
+
+    private final DoubleProperty RPM = new SimpleDoubleProperty();
 
     public EngineType getEngineType() {
         return engineType;
@@ -63,6 +67,14 @@ public class Engine {
         return crankshaft;
     }
 
+    public double getRPM() {
+        return RPM.get();
+    }
+
+    public DoubleProperty RPMProperty() {
+        return RPM;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Engine)) {
@@ -74,7 +86,8 @@ public class Engine {
         return Objects.equals(engineType, other.engineType)
                 && Objects.equals(engineLocation, other.engineLocation)
                 && Objects.equals(manufacturer.get(), other.manufacturer.get())
-                && crankshaft.equals(other.crankshaft);
+                && crankshaft.equals(other.crankshaft)
+                && RPM.get() == other.RPM.get();
     }
 
     @Override
@@ -84,6 +97,7 @@ public class Engine {
                 ",\n  engineLocation = " + engineLocation +
                 ",\n  manufacturer = " + manufacturer.get() +
                 ",\n  crankshaft = " + crankshaft +
+                ",\n  RPM = " + RPM.get() +
                 "\n}";
     }
 }

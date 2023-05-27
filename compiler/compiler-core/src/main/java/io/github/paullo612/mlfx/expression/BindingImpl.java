@@ -69,11 +69,12 @@ class BindingImpl extends StaticBindingImpl<BindingContext> {
                 ClassElement targetType) {
             expressionRenderer.render(methodVisitor -> {
                 methodVisitor.loadThis();
-                methodVisitor.swap();
-                methodVisitor.invokeVirtual(
-                        Type.getType(propertyClass),
-                        new Method("set", "(" + RenderUtils.type(targetType) + ")V")
-                );
+
+                Type propertyType = Type.getType(propertyClass);
+                Type type = RenderUtils.type(targetType);
+
+                methodVisitor.swap(type, propertyType);
+                methodVisitor.invokeVirtual(propertyType, new Method("set", "(" + type + ")V"));
             });
         }
     }
