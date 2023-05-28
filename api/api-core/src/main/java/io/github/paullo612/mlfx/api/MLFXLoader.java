@@ -299,6 +299,11 @@ public class MLFXLoader {
                             DELEGATE.createControllerAccessor(controllerClass), controllerFactory
                     );
                 }
+
+                @Override
+                public boolean isBackedByControllerFactory() {
+                    return true;
+                }
             };
         } else {
             factory = DELEGATE;

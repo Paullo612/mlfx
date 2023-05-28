@@ -18,6 +18,7 @@ package io.github.paullo612.mlfx.compiler
 import io.github.paullo612.mlfx.api.CompiledFXMLLoader
 import io.github.paullo612.mlfx.api.CompiledLoadException
 import io.github.paullo612.mlfx.api.ControllerAccessor
+import io.github.paullo612.mlfx.api.ControllerAccessorFactory
 import io.github.paullo612.mlfx.api.Result
 import javafx.fxml.FXMLLoader
 import org.opentest4j.AssertionFailedError
@@ -91,6 +92,14 @@ class ComplianceSpec extends CompileSpec {
         @Override
         Class<C> getControllerClass() {
             controllerClass
+        }
+    }
+
+    private static class ControllerAccessorFactoryImpl implements ControllerAccessorFactory {
+
+        @Override
+        <C> ControllerAccessor<C> createControllerAccessor(Class<C> controllerClass) {
+            new ControllerAccessorImpl<C>(controllerClass)
         }
     }
 
@@ -241,8 +250,7 @@ class ComplianceSpec extends CompileSpec {
         Class<? extends CompiledFXMLLoader> compiledLoaderClass = loaderClass.asSubclass(CompiledFXMLLoader.class)
 
         CompiledFXMLLoader<?, ?> loader = compiledLoaderClass.getDeclaredConstructor().newInstance()
-        Result<?, ?> result =
-                loader.load(c -> new ControllerAccessorImpl<>(c), controller, root, resourceBundle)
+        Result<?, ?> result = loader.load(new ControllerAccessorFactoryImpl(), controller, root, resourceBundle)
 
         new LoadResult(result.rootInstance, result.controller)
     }
