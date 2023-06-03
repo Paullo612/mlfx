@@ -51,6 +51,8 @@ class RootRenderer implements CompilerContext.Renderer {
     private static final String REQUIRES_EXTERNAL_CONTROLLER_METHOD_NAME = "requiresExternalController";
     private static final String GET_ROOT_INSTANCE_CLASS_METHOD_NAME = "getRootInstanceClass";
     private static final String GET_CONTROLLER_METHOD_NAME = "getControllerClass";
+    private static final String CAN_CREATE_CONTROLLER_METHOD_NAME = "canCreateController";
+    private static final String CREATE_CONTROLLER_METHOD_NAME = "createController";
 
     private static final String CREATE_RESULT_METHOD_NAME = "createResult";
 
@@ -123,6 +125,7 @@ class RootRenderer implements CompilerContext.Renderer {
     private boolean hasFxRoot;
     private boolean hasController;
     private boolean requiresExternalController;
+    private boolean canCreateController;
 
     private String internalClassName;
 
@@ -133,21 +136,23 @@ class RootRenderer implements CompilerContext.Renderer {
     }
 
     void initialize(
-            ClassElement targetType,
+            ClassElement targetClassElement,
             ClassElement rootClassElement,
             ClassElement controllerClassElement,
             boolean hasFxRoot,
             boolean hasController,
-            boolean requiresExternalController) {
+            boolean requiresExternalController,
+            boolean canCreateController) {
         this.rootClassElement = rootClassElement;
         this.controllerClassElement = controllerClassElement;
         this.rootType = RenderUtils.type(rootClassElement);
         this.controllerType = RenderUtils.type(controllerClassElement);
         this.hasFxRoot = hasFxRoot;
         this.hasController = hasController;
+        this.canCreateController = canCreateController;
         this.requiresExternalController = requiresExternalController;
 
-        this.internalClassName = RenderUtils.type(targetType).getInternalName();
+        this.internalClassName = RenderUtils.type(targetClassElement).getInternalName();
 
         startLoaderClass();
 
@@ -519,6 +524,78 @@ class RootRenderer implements CompilerContext.Renderer {
         getControllerClassMethod.visitEnd();
     }
 
+    private void renderCanCreateControllerMethod() {
+        MethodVisitor requiresExternalControllerMethod = loaderWriter.visitMethod(
+                Opcodes.ACC_PUBLIC,
+                CAN_CREATE_CONTROLLER_METHOD_NAME,
+                "()Z",
+                null,
+                null
+        );
+        requiresExternalControllerMethod.visitCode();
+        requiresExternalControllerMethod.visitInsn(Opcodes.ICONST_1);
+        requiresExternalControllerMethod.visitInsn(Opcodes.IRETURN);
+
+        // MAXSTACK = 1 (result)
+        // MAXLOCALS = 1 (this)
+        requiresExternalControllerMethod.visitMaxs(1, 1);
+        requiresExternalControllerMethod.visitEnd();
+    }
+
+    private void renderCreateControllerMethod() {
+        // Generate bridge method first.
+        MethodVisitor bridgeMethod = loaderWriter.visitMethod(
+                Opcodes.ACC_PUBLIC | Opcodes.ACC_BRIDGE | Opcodes.ACC_SYNTHETIC,
+                CREATE_CONTROLLER_METHOD_NAME,
+                "()" + RenderUtils.OBJECT_D,
+                null,
+                new String[] { Type.getType(CompiledLoadException.class).getInternalName() }
+        );
+
+        bridgeMethod.visitCode();
+        // ALOAD 0 (this)
+        bridgeMethod.visitVarInsn(Opcodes.ALOAD, 0);
+
+        bridgeMethod.visitMethodInsn(
+                Opcodes.INVOKEVIRTUAL,
+                internalClassName,
+                CREATE_CONTROLLER_METHOD_NAME,
+                "()" + controllerType.getDescriptor(),
+                false
+        );
+
+        // ARETURN
+        bridgeMethod.visitInsn(Opcodes.ARETURN);
+        // MAXSTACK = 1 (this)
+        // MAXLOCALS = 1 (this)
+        bridgeMethod.visitMaxs(1, 1);
+
+        MethodVisitor createControllerMethod = loaderWriter.visitMethod(
+                Opcodes.ACC_PUBLIC,
+                CREATE_CONTROLLER_METHOD_NAME,
+                "()" + controllerType.getDescriptor(),
+                null,
+                new String[] { Type.getType(CompiledLoadException.class).getInternalName() }
+        );
+
+        createControllerMethod.visitCode();
+        createControllerMethod.visitTypeInsn(Opcodes.NEW, controllerType.getInternalName());
+        createControllerMethod.visitInsn(Opcodes.DUP);
+        createControllerMethod.visitMethodInsn(
+                Opcodes.INVOKESPECIAL,
+                controllerType.getInternalName(),
+                RenderUtils.CONSTRUCTOR_N,
+                "()V",
+                false
+        );
+
+        // ARETURN
+        createControllerMethod.visitInsn(Opcodes.ARETURN);
+        // MAXSTACK = 2 (controller, controller)
+        // MAXLOCALS = 1 (controller)
+        createControllerMethod.visitMaxs(2, 1);
+    }
+
     byte[] dispose() {
         loadMethodVisitor.loadThis();
 
@@ -590,6 +667,11 @@ class RootRenderer implements CompilerContext.Renderer {
         renderRequiresResourceBundleMethod();
         renderGetRootInstanceClassMethod();
         renderGetControllerClassMethod();
+
+        if (canCreateController) {
+            renderCanCreateControllerMethod();
+            renderCreateControllerMethod();
+        }
 
         loaderWriter.visitEnd();
 

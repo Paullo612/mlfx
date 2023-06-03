@@ -126,8 +126,11 @@ public abstract class CompiledFXMLLoader<R, C> {
                 }
 
                 accessor = controllerAccessorFactory.createControllerAccessor(controllerClass);
-                // Controller is required, but none provided. Create one.
-                controllerInstance = accessor.newControllerInstance();
+                // Controller is required, but none provided. Create one. Create it directly if we're able to do so and
+                //  there is no controller factory specified. Fallback to accessor otherwise.
+                controllerInstance = canCreateController() && !controllerAccessorFactory.isBackedByControllerFactory()
+                        ? createController()
+                        : accessor.newControllerInstance();
             }
 
             return doLoad(controllerAccessorFactory, resourceBundle, castRoot, accessor, controllerInstance);
@@ -151,8 +154,8 @@ public abstract class CompiledFXMLLoader<R, C> {
      * @param rootInstance instance of root element specified by user or {@code null} if document's root element is not
      *                     fx:root
      * @param accessor controller accessor or {@code null} if there is no controller
-     * @param controller controller specified by user or {@code null} if controller is specified on document's
-     *                                 root element
+     * @param controller controller specified by user or {@code null} if controller is specified on document's root
+     *                   element
      * @return load result
      *
      * @throws CompiledLoadException in case of load failure
@@ -174,12 +177,12 @@ public abstract class CompiledFXMLLoader<R, C> {
     public abstract int getABIVersion();
 
     /**
-     * Returns original URL of compiled FXML file.
+     * Returns original URI of compiled FXML file.
      *
      * <p>Intended to be implemented by generated code.</p>
      *
-     * @return original URL
-     * @throws CompiledLoadException in case URL cannot be constructed.
+     * @return original URI
+     * @throws CompiledLoadException in case URI cannot be constructed
      */
     public abstract URI getURI() throws CompiledLoadException;
 
@@ -226,6 +229,32 @@ public abstract class CompiledFXMLLoader<R, C> {
      */
     public boolean requiresRootInstance() {
         return getRootInstanceClass().isPresent();
+    }
+
+    /**
+     * Whether this loader can create new controller instance.
+     *
+     * <p>Intended to be implemented by generated code.</p>
+     *
+     * @return {@code true} if new controller instance can be created by this loader, {@code false} otherwise
+     */
+    public boolean canCreateController() {
+        return false;
+    }
+
+    /**
+     * Creates controller.
+     *
+     * <p>Intended to be implemented by generated code.</p>
+     *
+     * @return new controller instance
+     * @throws CompiledLoadException if there is no controller specified, or it does not have accessible no-args
+     *         constructor
+     */
+    public C createController() throws CompiledLoadException {
+        throw new CompiledLoadException(
+                "There is no controller, or controller does not have accessible no-args constructor"
+        );
     }
 
     /**

@@ -349,6 +349,15 @@ class FXMLCompiler {
                         controllerClassElement = context.getClassElement(Object.class);
                     }
 
+                    boolean canCreateController = hasController
+                            && !context.requiresExternalController()
+                            && controllerClassElement.getEnclosedElement(
+                                    ElementQuery.CONSTRUCTORS
+                                            .filter(c -> c.getParameters().length == 0)
+                                            .filter(c -> !c.isReflectionRequired(context.getTargetType()))
+                            )
+                            .isPresent();
+
                     LoadableFXMLElement<?> loadableFXMLElement = element.asLoadableFXMLElement();
                     assert loadableFXMLElement != null;
 
@@ -358,7 +367,8 @@ class FXMLCompiler {
                             controllerClassElement,
                             hasFxRoot,
                             hasController,
-                            context.requiresExternalController()
+                            context.requiresExternalController(),
+                            canCreateController
                     );
                 }
 
