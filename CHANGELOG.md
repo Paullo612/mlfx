@@ -1,3 +1,15 @@
+# v.0.6.2
+
+## Changes
+
+* Do not use API from com.sun.* packages in compiler implementation.
+* Fix handling of binding expressions that return two slot primitives.
+* Fix handling of static properties with object arguments.
+* Implement non-reflective controllers instantiation.
+* Add Micronaut 4 support.
+
+---
+
 # v.0.6.1
 
 ## Changes
