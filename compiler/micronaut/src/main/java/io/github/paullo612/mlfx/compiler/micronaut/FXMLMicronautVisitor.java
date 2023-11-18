@@ -19,8 +19,10 @@ import com.google.auto.service.AutoService;
 import io.github.paullo612.mlfx.compiler.CompileFXMLVisitor;
 import io.micronaut.context.annotation.Executable;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.AnnotationValueBuilder;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.version.VersionUtils;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -29,6 +31,7 @@ import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.visitor.TypeElementVisitor;
 import io.micronaut.inject.visitor.VisitorContext;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +39,27 @@ import java.util.Set;
 @AutoService(TypeElementVisitor.class)
 public class FXMLMicronautVisitor implements TypeElementVisitor<Object, Object> {
 
+    private static final boolean IS_MICRONAUT_4_OR_HIGHER = VersionUtils.isAtLeastMicronautVersion("4.0.0");
+
     private static final String FXML_ANNOTATION = "javafx.fxml.FXML";
+
+    private static Introspected.Visibility ANY_VISIBILITY;
+
+    private AnnotationValueBuilder<Introspected> setVisibility(AnnotationValueBuilder<Introspected> builder) {
+        if (!IS_MICRONAUT_4_OR_HIGHER) {
+            return builder;
+        }
+
+        if (ANY_VISIBILITY == null) {
+            ANY_VISIBILITY = Arrays.stream(Introspected.Visibility.values())
+                    .filter(v -> "ANY".equals(v.name()))
+                    .findFirst()
+                    .orElseThrow(AssertionError::new);
+        }
+
+        return builder
+                .member("visibility", ANY_VISIBILITY);
+    }
 
     private void markAsIntrospected(ClassElement classElement, VisitorContext context) {
         if (classElement.hasStereotype(Introspected.class)) {
@@ -66,6 +89,16 @@ public class FXMLMicronautVisitor implements TypeElementVisitor<Object, Object> 
                         field
                 );
             }
+
+            if (!IS_MICRONAUT_4_OR_HIGHER) {
+                if (field.isProtected()) {
+                    context.fail(
+                            "Controller field is protected and is annotated by @FXML annotation. Protected fields"
+                                    + " cannot be set to controller by Micronaut version lower than 4.0.0.",
+                            field
+                    );
+                }
+            }
         }
 
         String[] toInclude = fields.stream()
@@ -84,11 +117,13 @@ public class FXMLMicronautVisitor implements TypeElementVisitor<Object, Object> 
             toExclude = new String[0];
         }
 
-        classElement.annotate(AnnotationValue.builder(Introspected.class)
-                .member("accessKind", Introspected.AccessKind.FIELD)
-                .member("includes", toInclude)
-                .member("excludes", toExclude)
-                .build()
+        classElement.annotate(
+                setVisibility(AnnotationValue.builder(Introspected.class)
+                        .member("accessKind", Introspected.AccessKind.FIELD)
+                        .member("includes", toInclude)
+                        .member("excludes", toExclude)
+                )
+                        .build()
         );
     }
 

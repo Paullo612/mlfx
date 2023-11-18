@@ -49,6 +49,8 @@ class PropertyReadContinuation extends AbstractNamedContinuation {
 
             this.property = previousClassElement.getBeanProperties().stream()
                     .filter(p -> p.getName().equals(getName()))
+                    // Write only properties were introduced in micronaut 4.
+                    .filter(p -> p.getReadMethod().isPresent())
                     .findFirst()
                     .map(ElementUtils::fixProperty)
                     .orElseThrow(() -> context.compileError(
@@ -97,7 +99,7 @@ class PropertyReadContinuation extends AbstractNamedContinuation {
         PropertyElement property = getProperty();
 
         MethodElement getter = property.getReadMethod()
-                // NB: Property must always have read method, or it will not be considered as property by Micronaut.
+                // NB: Property must always have read method. See property filter.
                 .orElseThrow(AssertionError::new);
 
         return methodVisitor -> RenderUtils.renderMethodCall(methodVisitor, getter);

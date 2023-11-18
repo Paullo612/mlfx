@@ -34,6 +34,11 @@ public final class ElementUtils {
     }
 
     public static boolean isAssignable(ClassElement from, ClassElement to) {
+        // NB: primitives are considered assignable to boxed types since Micronaut 4.0.0
+        if (from.isPrimitive() && !to.isPrimitive() || !from.isPrimitive() && to.isPrimitive()) {
+            return false;
+        }
+
         from = smashUpGeneric(from);
         to = smashUpGeneric(to);
 
@@ -52,6 +57,11 @@ public final class ElementUtils {
 
     public static boolean isAssignable(ClassElement from, Class<?> to) {
         assert !to.isArray();
+
+        // NB: primitives are considered assignable to boxed types since Micronaut 4.0.0
+        if (from.isPrimitive() && !to.isPrimitive() || !from.isPrimitive() && to.isPrimitive()) {
+            return false;
+        }
 
         from = smashUpGeneric(from);
 
