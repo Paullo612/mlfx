@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Paullo612
+ * Copyright 2025 Paullo612
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,6 +242,10 @@ class BindingExpressionRendererImpl implements BindingContext.BindingExpressionR
         }
 
         void store(MethodVisitor methodVisitor) {
+            if (classElement.isTypeVariable()) {
+                methodVisitor.visitTypeInsn(Opcodes.CHECKCAST, RenderUtils.type(classElement).getInternalName());
+            }
+
             methodVisitor.visitFieldInsn(
                     Opcodes.PUTFIELD,
                     parent.getInternalName(),
