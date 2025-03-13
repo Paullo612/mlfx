@@ -1,3 +1,12 @@
+# v.0.6.3
+
+## Changes
+
+* Fix storing generic types inside of binding expressions.
+* Stop smashing up source type generics when checking assignability.
+
+---
+
 # v.0.6.2
 
 ## Changes
